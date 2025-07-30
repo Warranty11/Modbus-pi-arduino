@@ -1,0 +1,20 @@
+import minimalmodbus
+import time
+
+minimalmodbus.DEBUG = True
+
+arduino = minimalmodbus.Instrument('/dev/ttyUSB0', 1)
+arduino.serial.baudrate = 115200
+arduino.serial.timeout = 2
+arduino.mode = minimalmodbus.MODE_RTU
+
+time.sleep(2)
+
+try:
+    # Читаем 2 регистра, начиная с адреса 1
+    version_data = arduino.read_registers(1, 2)
+    fw_major = version_data[0]
+    fw_minor = version_data[1]
+    print(f"Версия прошивки Arduino: {fw_major}.{fw_minor}")
+except Exception as e:
+    print("Ошибка:", e)
