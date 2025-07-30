@@ -1,0 +1,30 @@
+#include <ModbusRtu.h>
+
+const uint8_t slaveID = 1;
+uint16_t regs[3];  // 0 — управление светодиодом, 1 — major, 2 — minor
+
+const uint16_t FW_VERSION_MAJOR = 1;
+const uint16_t FW_VERSION_MINOR = 0;
+
+Modbus slave;
+
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // Установка версии прошивки
+  regs[1] = FW_VERSION_MAJOR;
+  regs[2] = FW_VERSION_MINOR;
+
+  slave = Modbus(slaveID, Serial, 4);  // Через USB
+  slave.begin(115200);
+}
+
+void loop() {
+  if (slave.poll(regs, 3)) {
+    // Регистр 0 — управление светодиодом
+    if (regs[0] == 1)
+      digitalWrite(LED_BUILTIN, HIGH);
+    else
+      digitalWrite(LED_BUILTIN, LOW);
+  }
+}
